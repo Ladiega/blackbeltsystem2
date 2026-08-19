@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #0f0f0f;
+  --foreground: #e4e4e7;
+  --sidebar-bg: #18181b;
+  --card-bg: #27272a;
+  --accent: #dc2626;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.cinturon-blanco {
+  background: linear-gradient(135deg, #f5f5f5, #d4d4d4);
+  border: 2px solid #a3a3a3;
+}
+
+.cinturon-azul {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.cinturon-violeta {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+.cinturon-marron {
+  background: linear-gradient(135deg, #92400e, #78350f);
+}
+
+.cinturon-negro {
+  background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+  border: 2px solid #404040;
+}
+
+.progress-bar-track {
+  background: #27272a;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.8s ease-in-out;
+}
