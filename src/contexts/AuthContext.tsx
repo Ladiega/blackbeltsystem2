@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/libs/supabase";
 import type { User } from "@supabase/supabase-js";
 
@@ -19,6 +20,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [nombreUsuario, setNombreUsuario] = useState("");
   const [cargando, setCargando] = useState(true);
+  const router = useRouter();
+
+  const cargarNombreUsuario = useCallback(async (userId: string) => {
+    const { data } = await supabase
+      .from("usuarios")
+      .select("nombre")
+      .eq("id", userId)
+      .single();
+
+    if (data) {
+      setNombreUsuario(data.nombre);
+    }
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -41,19 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  async function cargarNombreUsuario(userId: string) {
-    const { data } = await supabase
-      .from("usuarios")
-      .select("nombre")
-      .eq("id", userId)
-      .single();
-
-    if (data) {
-      setNombreUsuario(data.nombre);
-    }
-  }
+  }, [cargarNombreUsuario]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -70,14 +72,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return { exito: true };
-  }, []);
+  }, [cargarNombreUsuario]);
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
     setNombreUsuario("");
-    window.location.href = "/login";
-  }, []);
+    router.replace("/login");
+  }, [router]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn: !!user, cargando, user, nombreUsuario, login, logout }}>

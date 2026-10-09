@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/libs/supabase";
 import {
@@ -10,17 +10,14 @@ import {
   getTotalGrados,
   getLabelCinturon,
   getColorTexto,
-  getColorTailwind,
   type Alumno,
   type EventoProgreso,
-  type ColorCinturon,
 } from "@/libs/types";
-import { ArrowLeft, Mail, Phone, Shield, Calendar, MapPin, Pencil, TrendingUp, Trophy, Award } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Shield, Calendar, MapPin, Pencil, TrendingUp, Award } from "lucide-react";
 import PhotoUpload from "@/components/PhotoUpload";
 
 export default function PerfilAlumno() {
   const params = useParams();
-  const router = useRouter();
   const id = params.id as string;
   const [alumno, setAlumno] = useState<Alumno | null>(null);
   const [eventos, setEventos] = useState<EventoProgreso[]>([]);
@@ -31,11 +28,7 @@ export default function PerfilAlumno() {
   const [descEvento, setDescEvento] = useState("");
   const [guardandoEvento, setGuardandoEvento] = useState(false);
 
-  useEffect(() => {
-    cargarDatos();
-  }, [id]);
-
-  async function cargarDatos() {
+  const cargarDatos = useCallback(async () => {
     const [alumnoResult, eventosResult] = await Promise.all([
       supabase.from("alumnos").select("*").eq("id", id).single(),
       supabase.from("eventos_progreso").select("*").eq("alumno_id", id).order("fecha", { ascending: false }),
@@ -43,7 +36,27 @@ export default function PerfilAlumno() {
     setAlumno(alumnoResult.data);
     setEventos(eventosResult.data || []);
     setCargando(false);
-  }
+  }, [id]);
+
+  useEffect(() => {
+    let activo = true;
+    Promise.all([
+      supabase.from("alumnos").select("*").eq("id", id).single(),
+      supabase.from("eventos_progreso").select("*").eq("alumno_id", id).order("fecha", { ascending: false }),
+    ])
+      .then(([alumnoResult, eventosResult]) => {
+        if (!activo) return;
+        setAlumno(alumnoResult.data);
+        setEventos(eventosResult.data || []);
+        setCargando(false);
+      })
+      .catch(() => {
+        if (activo) setCargando(false);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [id]);
 
   async function ascenderGrado() {
     if (!alumno) return;

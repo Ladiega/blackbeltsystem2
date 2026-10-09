@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shield, Eye, EyeOff } from "lucide-react";
 
+function traducirError(mensaje?: string): string {
+  if (!mensaje) return "Error al iniciar sesión";
+  if (mensaje.includes("Invalid login credentials")) return "Correo o contraseña incorrectos";
+  if (mensaje.includes("Email not confirmed")) return "Debes confirmar tu correo electrónico";
+  if (mensaje.includes("fetch") || mensaje.includes("NetworkError")) {
+    return "No se pudo conectar con el servidor. Revisa tu conexión o la configuración de Supabase.";
+  }
+  return mensaje;
+}
+
 export default function LoginPage() {
   const { login, isLoggedIn } = useAuth();
   const router = useRouter();
@@ -28,7 +38,7 @@ export default function LoginPage() {
     const resultado = await login(email, clave);
 
     if (!resultado.exito) {
-      setError("Correo o contraseña incorrectos");
+      setError(traducirError(resultado.error));
       setClave("");
       setCargando(false);
     }

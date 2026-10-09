@@ -3,6 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
+import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
@@ -60,7 +61,7 @@ function MobileNav() {
       {links.map((link) => {
         const isActive = pathname === link.href;
         return (
-          <a
+          <Link
             key={link.href}
             href={link.href}
             className={`flex flex-col items-center gap-1 px-3 py-1 rounded-lg transition-colors ${
@@ -69,7 +70,7 @@ function MobileNav() {
           >
             <span className="text-xl">{link.icon}</span>
             <span className="text-[10px] font-medium">{link.label}</span>
-          </a>
+          </Link>
         );
       })}
     </nav>

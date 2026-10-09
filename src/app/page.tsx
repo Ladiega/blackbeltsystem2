@@ -9,21 +9,43 @@ import { Users, UserCheck, Trophy, TrendingUp } from "lucide-react";
 export default function Dashboard() {
   const [alumnos, setAlumnos] = useState<Alumno[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    supabase
-      .from("alumnos")
-      .select("*")
-      .then(({ data }) => {
-        setAlumnos(data || []);
-        setCargando(false);
-      });
+    let activo = true;
+    (async () => {
+      try {
+        const { data, error } = await supabase.from("alumnos").select("*");
+        if (!activo) return;
+        if (error) {
+          setError(error.message);
+        } else {
+          setAlumnos(data || []);
+        }
+      } catch (err) {
+        if (activo) setError(err instanceof Error ? err.message : "Error al cargar los datos");
+      } finally {
+        if (activo) setCargando(false);
+      }
+    })();
+    return () => {
+      activo = false;
+    };
   }, []);
 
   if (cargando) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-xl font-semibold text-white mb-2">Error al cargar los datos</h2>
+        <p className="text-zinc-400 text-sm">{error}</p>
       </div>
     );
   }
