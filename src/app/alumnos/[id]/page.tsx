@@ -264,13 +264,17 @@ export default function PerfilAlumno() {
         </div>
 
         <div className="mb-4 md:mb-6">
-          <div className="progress-bar-track h-4 md:h-5 rounded-full">
+          <div className="progress-bar-track relative h-4 md:h-5 rounded-full">
             <div
-              className="progress-bar-fill rounded-full"
+              className="absolute inset-0"
               style={{
-                width: `${porcentajeProgreso}%`,
-                background: "linear-gradient(90deg, #22c55e, #eab308, #f97316, #ef4444, #171717)",
+                background:
+                  "linear-gradient(90deg, #f5f5f5 0%, #2563eb 20%, #7c3aed 40%, #92400e 60%, #171717 80%, #171717 100%)",
               }}
+            />
+            <div
+              className="absolute inset-y-0 right-0 bg-[#27272a] transition-[width] duration-[800ms] ease-in-out"
+              style={{ width: `${100 - porcentajeProgreso}%` }}
             />
           </div>
           <div className="flex justify-between mt-2 text-xs text-zinc-500">
